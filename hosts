@@ -1,3 +1,7 @@
-[webserver]
-10.0.2.4
-10.0.2.5
+[serveurweb]
+81.28.97.16 user=node1 domain="81.28.97.16"
+81.28.97.17 user=node2 domain="81.28.97.17"
+
+[db]
+db1
+db2

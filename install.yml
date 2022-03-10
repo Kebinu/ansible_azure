@@ -1,0 +1,58 @@
+---
+- name: installation serveur web (documenter chaque action)
+  hosts: serveurweb
+  remote_user: root
+#  vars:
+#    user: node
+
+  tasks:
+    - name: installation apache et php
+      apt:
+        pkg:
+          - apache2
+          - php
+
+    - name: ajout user
+      user:
+        name: "{{ user }}"
+        password: !
+        shell: /bin/false
+
+    - name: creer dossier user
+      file:
+        path: /var/www/{{ domain }}
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+
+    - name: phpinfo
+      copy:
+        src: files/index.php
+        dest: /var/www/{{ domain }}
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+
+    - name: Copy virtualhost
+      template:
+        src: templates/virtualhost.conf.j2
+        dest: /etc/apache2/sites-available/virtualhost.conf
+
+    - name: Remove default virtualhost
+      command: a2dissite 000-default.conf
+      args:
+        removes: /etc/apache2/sites-enabled/000-default.conf
+      notify: relancer Apache
+
+    - name: Add virtualhost.conf
+      command: a2ensite virtualhost.conf
+      args:
+        creates: /etc/apache2/sites-enabled/virtualhost.conf
+      notify: relancer Apache
+
+  handlers:
+    - name: relancer Apache
+      service:
+        name: apache2
+        state: reloaded
