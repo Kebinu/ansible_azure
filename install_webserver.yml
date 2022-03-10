@@ -1,0 +1,14 @@
+---
+- name: ping sur webserveur
+  hosts: webserver
+  remote_user: testadmin
+
+  tasks:
+    - name: installation apache 
+      apt:
+        name: apache2
+      become: yes
+    - name: installation php
+      apt:
+        name: php
+      become: yes
